@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import multiprocessing
 import os
 import sys
@@ -79,7 +80,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.once:
             await client.close()
 
-    client.run(token)
+    client.run(token, log_level=logging.WARNING)
 
     return 0
 
