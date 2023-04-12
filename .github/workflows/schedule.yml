@@ -45,7 +45,7 @@ jobs:
 
       - name: Update PATH for Poetry
         run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
 
       - name: Configure Poetry
         run: poetry config virtualenvs.in-project true

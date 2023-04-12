@@ -20,6 +20,9 @@ jobs:
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout the latest code
@@ -27,16 +30,10 @@ jobs:
 
       - name: Download actionlint
         id: download_actionlint
-        shell: bash
         run: |
           bash <(curl "https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash")
 
-      - name: Enable actionlint matcher
-        shell: bash
+      - name: Lint workflow files with actionlint
         run: |
           echo "::add-matcher::.github/actionlint-matcher.json"
-
-      - name: Lint workflow files with actionlint
-        shell: bash
-        run: |
           ${{ steps.download_actionlint.outputs.executable }} -color
