@@ -1,0 +1,58 @@
+[build-system]
+requires = ["poetry-core>=1.1.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "randa"
+version = "0.0.1"
+description = ""
+license = "AGPL-3.0-or-later"
+authors = ["mataha <mataha@users.noreply.github.com>"]
+readme = "docs/README.md"
+repository = "https://github.com/mataha/randa"
+keywords = []
+classifiers = []
+packages = [
+    { include = "randa", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11.2"
+
+aiohttp = { version = "^3.8.4", extras = ["speedups"] }
+discord-py = "^2.2.2"
+python-dotenv = "^1.0.0"
+ujson = "^5.7.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.2"
+ruff = "0.0.261"
+
+[tool.poetry.group.test.dependencies]
+#pytest
+#pytest-cov
+
+[tool.poetry.group.typing.dependencies]
+mypy = ">=1.2.0"
+types-ujson = ">=5.7.0"
+
+[tool.poetry.scripts]
+main = { callable = "randa.main:main" }
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.flake8] # https://github.com/john-hen/Flake8-pyproject
+ignore = ['E231', 'E241']
+per-file-ignores = [
+    '__init__.py:F401',
+]
+max-line-length = 88
+count = true
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "^3.11"
