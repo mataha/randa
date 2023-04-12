@@ -1,0 +1,73 @@
+name: Report current terror zones
+
+on:
+  schedule:
+    #        ┌───────────── minute (0 - 59)
+    #        │ ┌───────────── hour (0 - 23)
+    #        │ │ ┌───────────── day of the month (1 - 31)
+    #        │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        │ │ │ │ │
+    #        │ │ │ │ │
+    #        │ │ │ │ │
+    #        * * * * *
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  report:
+    name: Report terror zones for current time
+    environment: production
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version-file: '.python-version'
+          update-environment: true
+
+      - name: Set up Poetry from local script
+        run: |
+          "./bootstrap/poetry/install-poetry.py" --yes
+
+      - name: Update PATH for Poetry
+        run: |
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure Poetry
+        run: poetry config virtualenvs.in-project true
+
+      - name: Set up cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ".venv"
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Ensure cache is healthy
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          timeout 10s poetry run pip --version || rm -rf ".venv"
+
+      - name: Install all necessary dependencies
+        run: poetry install --only main
+
+      - name: Run main module once
+        run: poetry run main --once
+        env:
+          RANDA_DISCORD_CHANNELS: ${{ secrets.RANDA_DISCORD_CHANNELS }}
+          RANDA_DISCORD_TOKEN: ${{ secrets.RANDA_DISCORD_TOKEN }}
+          RANDA_D2RW_TOKEN: ${{ secrets.RANDA_D2RW_TOKEN }}
